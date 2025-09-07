@@ -1,0 +1,12 @@
+How does chess start
+
+Initialize Grid, [8 x 8] (gui.py)
+Figure out how to connect stuff with other files
+
+Create Pieces give them their own function
+
+Make them MOVE
+
+Set in the win/lose
+
+Add AI :<
