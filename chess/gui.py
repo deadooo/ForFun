@@ -29,12 +29,27 @@ def draw_chess_board():
                 
 def valid_move(mouse_pos): # Walmart version
     x, y = mouse_pos
+    x_row = 0
+    y_col = 0
     pawn = True
     if(pawn):
-        while(x >= 40):
-            print("Hello")
-        return True
-    return True
+        while(x >= 0):
+            x = x - 80
+            x_row = x_row + 1
+            print("This is X " + str(x_row)) # Test
+        while(y >= 0):
+            y = y - 80
+            y_col = y_col + 1
+            print("This is Y " + str(y_col)) # Test
+        
+        x_row -= 1 #ease of calculating lawl
+        y_col -= 1
+        x = 40 + (x_row * 80) 
+        y = 40 + (y_col * 80)
+
+    mouse_pos = x, y
+    return mouse_pos
+    
     # if(x == 40 and y == 0):
     #     return
     # return
@@ -52,38 +67,19 @@ while running:
                 drag = True
         if(event.type == pygame.MOUSEBUTTONUP and drag): # Drop
             print(mouse_pos)
-            if(valid_move(mouse_pos)):
-                test_rect.center = mouse_pos
-            
-            
+            mouse_pos = valid_move(mouse_pos)
+            test_rect.center = mouse_pos
             drag = False
                 
                 
     if reset:
         draw_chess_board()
         reset == False       
-
     
-    screen.blit(test_surf, test_rect)
-    
-    
- 
         
     
     screen.blit(test_surf, test_rect)
-    # mouse_position = pygame.mouse.get_pos()
-    # # if black_pawn_rect.collidepoint(mouse_position):
-    # #     if(pygame.mouse.get_pressed()) == (True, False, False):
-    # #         print(mouse_position)
-    # #         if(pygame.mouse.get_pressed()) == (False, False, True):
-    # #             print(mouse_position)
-                
-    # if black_pawn_rect.collidepoint(mouse_position):
-    #     # print(mouse_position)
-    #     for event in pygame.event.get():
-    #         if(event.type == pygame.MOUSEBUTTONDOWN):
-    #             if(event.type == pygame.MOUSEBUTTONUP):
-    #                 print("Hello")
+    
             
                     
     
