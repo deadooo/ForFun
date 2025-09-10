@@ -36,11 +36,19 @@ def valid_move(mouse_pos): # Walmart version
         while(x >= 0):
             x = x - 80
             x_row = x_row + 1
-            print("This is X " + str(x_row)) # Test
+            # print("This is X " + str(x_row)) # Test
         while(y >= 0):
             y = y - 80
             y_col = y_col + 1
-            print("This is Y " + str(y_col)) # Test
+            # print("This is Y " + str(y_col)) # Test
+        print("This is X " + str(x_row)) # Test
+        print("This is Y " + str(y_col)) # Test
+        if(x_row > 8):x_row = 8
+        if(x_row < 1):x_row = 1
+        if(y_col > 8):y_col = 8
+        if(y_col < 1):y_col = 1
+        
+            
         
         x_row -= 1 #ease of calculating lawl
         y_col -= 1
@@ -63,10 +71,10 @@ while running:
         mouse_pos = pygame.mouse.get_pos()
         if(event.type == pygame.MOUSEBUTTONDOWN): # Press On Img 
             if(test_rect.collidepoint(mouse_pos)):
-                print(mouse_pos)
+                print(mouse_pos) # Test
                 drag = True
         if(event.type == pygame.MOUSEBUTTONUP and drag): # Drop
-            print(mouse_pos)
+            print(mouse_pos) # Test
             mouse_pos = valid_move(mouse_pos)
             test_rect.center = mouse_pos
             drag = False
