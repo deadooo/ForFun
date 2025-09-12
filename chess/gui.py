@@ -1,6 +1,36 @@
 # Example file showing a circle moving on screen
 import pygame
 
+class Pieces(pygame.sprite.Sprite):
+    def __init__(self, type, color):
+        super().__init__()
+        if color == 'white': # white
+            if type == 'pawn':
+                pawn_w = pygame.image.load('INSERT IMAGE').convert_alpha()
+            elif type == 'knight':
+                knight_w = pygame.image.load('INSERT IMAGE').convert_alpha()
+            elif type == 'bishop':
+                bishop_w = pygame.image.load('INSERT IMAGE').convert_alpha()
+            elif type == 'rook':
+                rook_w = pygame.image.load('INSERT IMAGE').convert_alpha()
+            elif type == 'queen':
+                queen_w = pygame.image.load('INSERT IMAGE').convert_alpha()
+            else: # 'king'
+                king_w = pygame.image.load('INSERT IMAGE').convert_alpha()
+        else: # BLACK
+            if type == 'pawn':
+                pawn_b = pygame.image.load('INSERT IMAGE').convert_alpha()
+            elif type == 'knight':
+                knight_b = pygame.image.load('INSERT IMAGE').convert_alpha()
+            elif type == 'bishop':
+                bishop_b = pygame.image.load('INSERT IMAGE').convert_alpha()
+            elif type == 'rook':
+                rook_b = pygame.image.load('INSERT IMAGE').convert_alpha()
+            elif type == 'queen':
+                queen_b = pygame.image.load('INSERT IMAGE').convert_alpha()
+            else: # 'king'
+                king_b = pygame.image.load('INSERT IMAGE').convert_alpha()
+
 # pygame setup
 pygame.init()
 screen = pygame.display.set_mode((640, 640))
@@ -26,6 +56,17 @@ def draw_chess_board():
                 chess_pos_x = x * 80
                 chess_pos_y = y * 80 
                 pygame.draw.rect(screen, 'white', (chess_pos_x, chess_pos_y, 80, 80))
+                
+def draw_pieces():
+    for x in range(8):
+        for y in range(8):
+            if(x + y) % 2 == 0:
+                piece_pos_x = (x + 1)
+                peice_pos_y = (y + 1)
+                test_rect.center = ()
+            else:
+                test_rect.center = ()
+                
                 
 def valid_move(mouse_pos): # Walmart version
     x, y = mouse_pos
