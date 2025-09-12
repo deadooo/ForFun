@@ -1,49 +1,39 @@
 # Example file showing a circle moving on screen
 import pygame
+from sys import exit
 
 class Pieces(pygame.sprite.Sprite):
-    def __init__(self, type, color):
+    def __init__(self, type, color, pos):
         super().__init__()
         if color == 'white': # white
             if type == 'pawn':
-                pawn_w = pygame.image.load('INSERT IMAGE').convert_alpha()
+                self.image = pygame.image.load('gameasset/White/white_pawn.png').convert_alpha()
             elif type == 'knight':
-                knight_w = pygame.image.load('INSERT IMAGE').convert_alpha()
+                self.image = pygame.image.load('gameasset/White/white_knight.png').convert_alpha()
             elif type == 'bishop':
-                bishop_w = pygame.image.load('INSERT IMAGE').convert_alpha()
+                self.image = pygame.image.load('gameasset/White/white_bishop.png').convert_alpha()
             elif type == 'rook':
-                rook_w = pygame.image.load('INSERT IMAGE').convert_alpha()
+                self.image = pygame.image.load('gameasset/White/white_rook.png').convert_alpha()
             elif type == 'queen':
-                queen_w = pygame.image.load('INSERT IMAGE').convert_alpha()
+                self.image = pygame.image.load('gameasset/White/white_queen.png').convert_alpha()
             else: # 'king'
-                king_w = pygame.image.load('INSERT IMAGE').convert_alpha()
-        else: # BLACK
+                self.image = pygame.image.load('gameasset/White/white_king.png').convert_alpha()
+        else: # black
             if type == 'pawn':
-                pawn_b = pygame.image.load('INSERT IMAGE').convert_alpha()
+                self.image = pygame.image.load('gameasset/Black/black_pawn.png').convert_alpha()
             elif type == 'knight':
-                knight_b = pygame.image.load('INSERT IMAGE').convert_alpha()
+                self.image = pygame.image.load('gameasset/Black/black_knight.png').convert_alpha()
             elif type == 'bishop':
-                bishop_b = pygame.image.load('INSERT IMAGE').convert_alpha()
+                self.image = pygame.image.load('gameasset/Black/black_bishop.png').convert_alpha()
             elif type == 'rook':
-                rook_b = pygame.image.load('INSERT IMAGE').convert_alpha()
+                self.image = pygame.image.load('gameasset/Black/black_rook.png').convert_alpha()
             elif type == 'queen':
-                queen_b = pygame.image.load('INSERT IMAGE').convert_alpha()
+                self.image = pygame.image.load('gameasset/Black/black_queen.png').convert_alpha()
             else: # 'king'
-                king_b = pygame.image.load('INSERT IMAGE').convert_alpha()
-
-# pygame setup
-pygame.init()
-screen = pygame.display.set_mode((640, 640))
-clock = pygame.time.Clock()
-running = True
-reset = True
-drag = False
-dt = 0
-
-player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
-test_surf = pygame.image.load('gameasset/black_chess_pawn.png').convert_alpha()
-test_rect = test_surf.get_rect(center = (40, 40)) # for x and y plus 80
-current_mouse_coords = ""
+                self.image = pygame.image.load('gameasset/Black/black_king.png').convert_alpha()
+        
+        self.rect = self.image.get_rect(topleft = pos)
+        
 
 def draw_chess_board():
     for x in range(8):
@@ -58,150 +48,89 @@ def draw_chess_board():
                 pygame.draw.rect(screen, 'white', (chess_pos_x, chess_pos_y, 80, 80))
                 
 def draw_pieces():
-    for x in range(8):
-        for y in range(8):
-            if(x + y) % 2 == 0:
-                piece_pos_x = (x + 1)
-                peice_pos_y = (y + 1)
-                test_rect.center = ()
-            else:
-                test_rect.center = ()
+    for y in range(8): # col
+        for x in range(8): # row
+            if y == 1: # black pawns
+                all_pieces.add(Pieces('pawn', 'black', (x * 80, 80)))
+            elif y == 6: # white pawns
+                all_pieces.add(Pieces('pawn', 'white', (x * 80, 480)))
                 
-                
-def valid_move(mouse_pos): # Walmart version
-    x, y = mouse_pos
-    x_row = 0
-    y_col = 0
-    pawn = True
-    if(pawn):
-        while(x >= 0):
-            x = x - 80
-            x_row = x_row + 1
-            # print("This is X " + str(x_row)) # Test
-        while(y >= 0):
-            y = y - 80
-            y_col = y_col + 1
-            # print("This is Y " + str(y_col)) # Test
-        print("This is X " + str(x_row)) # Test
-        print("This is Y " + str(y_col)) # Test
-        if(x_row > 8):x_row = 8
-        if(x_row < 1):x_row = 1
-        if(y_col > 8):y_col = 8
-        if(y_col < 1):y_col = 1
-        
             
-        
-        x_row -= 1 #ease of calculating lawl
-        y_col -= 1
-        x = 40 + (x_row * 80) 
-        y = 40 + (y_col * 80)
+                
+            if y == 0:
+                if x == 0 or x == 7: all_pieces.add(Pieces('rook', 'black', (x * 80, y * 80))) # black rook
+                if x == 1 or x == 6: all_pieces.add(Pieces('knight', 'black', (x * 80, y * 80))) # black horse
+                if x == 2 or x == 5: all_pieces.add(Pieces('bishop', 'black', (x * 80, y * 80))) # black bishop
+                if x == 3: all_pieces.add(Pieces('queen', 'black', (x * 80, y * 80))) # black queen
+                if x == 4: all_pieces.add(Pieces('king', 'black', (x * 80, y * 80))) # black king
+                
+            if y == 7:
+                if x == 0 or x == 7: all_pieces.add(Pieces('rook', 'white', (x * 80, y * 80))) # white rook
+                if x == 1 or x == 6: all_pieces.add(Pieces('knight', 'white', (x * 80, y * 80))) # white horse
+                if x == 2 or x == 5: all_pieces.add(Pieces('bishop', 'white', (x * 80, y * 80))) # white bishop
+                if x == 3: all_pieces.add(Pieces('queen', 'white', (x * 80, y * 80))) # white queen
+                if x == 4: all_pieces.add(Pieces('king', 'white', (x * 80, y * 80))) # white king
+                
+            
+                
 
-    mouse_pos = x, y
-    return mouse_pos
-    
-    # if(x == 40 and y == 0):
-    #     return
-    # return
+# Init Pieces
+all_pieces = pygame.sprite.Group()
+selected_piece = pygame.sprite.GroupSingle()
 
-while running:
+
+# pygame setup
+pygame.init()
+screen = pygame.display.set_mode((640, 640)) # 640 640 
+clock = pygame.time.Clock()
+dt = 0
+
+# Add Pieces (Add Function or For Loop w/Logic)
+draw_pieces()
+# all_pieces.add(Pieces("pawn", "white", (0 * 80, 6 * 80)))
+# all_pieces.add(Pieces("pawn", "white", (1 * 80, 6 * 80)))
+# all_pieces.add(Pieces("knight", "black", (0 * 80, 6 * 80)))
+
+dragging = False
+
+while True:
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
-        mouse_pos = pygame.mouse.get_pos()
-        if(event.type == pygame.MOUSEBUTTONDOWN): # Press On Img 
-            if(test_rect.collidepoint(mouse_pos)):
-                print(mouse_pos) # Test
-                drag = True
-        if(event.type == pygame.MOUSEBUTTONUP and drag): # Drop
-            print(mouse_pos) # Test
-            mouse_pos = valid_move(mouse_pos)
-            test_rect.center = mouse_pos
-            drag = False
-                
-                
-    if reset:
-        draw_chess_board()
-        reset == False       
-    
+            pygame.quit()
+            exit()
         
-    
-    screen.blit(test_surf, test_rect)
-    
+        
+        if event.type == pygame.MOUSEBUTTONDOWN: # Press On Piece
+            for piece in all_pieces:
+                if piece.rect.collidepoint(event.pos):
+                    selected_piece.add(piece)
+                    dragging = True
             
-                    
-    
-        
+                
+        if event.type == pygame.MOUSEBUTTONUP and dragging: # Drop
+            if selected_piece.sprite:
+                x, y = event.pos
+                col, row = x // 80, y // 80 # Double // for division + floor
+                selected_piece.sprite.rect.topleft = (col * 80, row * 80)
+            selected_piece.empty()
+            dragging = False
+            
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                all_pieces.empty()
+                draw_pieces()
+            
+    if dragging and selected_piece.sprite:
+        selected_piece.sprite.rect.center = pygame.mouse.get_pos()
+            
+    draw_chess_board()
+    all_pieces.draw(screen)
         
     # flip() the display to put your work on screen
     pygame.display.flip()
 
     # limits FPS to 60
-    # dt is delta time in seconds since last frame, used for framerate-
-    # independent physics.
-    dt = clock.tick(60) / 1000
-
-pygame.quit()
-
-
-
-
-
-# # Example file showing a basic pygame "game loop"
-# import pygame
-
-# # pygame setup
-# pygame.init()
-# screen = pygame.display.set_mode((1280, 720))
-# clock = pygame.time.Clock()
-# running = True
-
-# while running:
-#     # poll for events
-#     # pygame.QUIT event means the user clicked X to close your window
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT:
-#             running = False
-
-#     # fill the screen with a color to wipe away anything from last frame
-#     screen.fill("brown")
-
-#     # RENDER YOUR GAME HERE
-
-#     # flip() the display to put your work on screen
-#     pygame.display.flip()
-
-#     clock.tick(60)  # limits FPS to 60
-
-# pygame.quit()
-
-
-# from tkinter import * 
-
-# gui = Tk()
-# gui.geometry("600x645")
-# gui.title("Your Life")
-
-# icon = PhotoImage(file='chess/gameasset/teto_icon.png')
-# gui.iconphoto(True, icon)
-# gui.config(background="Brown")
-
-# def pawn():
-#     return
-        
-# def startButtonClicked():
-#     myLabel = Label(gui, text="Cums")
-#     myLabel.pack()
-
-# startButton = Button(gui, text="Touch me now please!", command=startButtonClicked)
-# startButton.pack()
-
-# Chess GRID
-# for row in range(8): 
-#     for col in range(8):
-#         color = "white" if (row + col) % 2 == 0 else "black"
-#         cell = Label(gui, width=10, height=5, bg=color)
-#         cell.grid(row=row, column=col)
-# gui.mainloop()    
+    clock.tick(60)
 
