@@ -5,6 +5,9 @@ from sys import exit
 class Pieces(pygame.sprite.Sprite):
     def __init__(self, type, color, pos):
         super().__init__()
+        self.pos = pos
+        self.type = type
+        self.color = color
         if color == 'white': # white
             if type == 'pawn':
                 self.image = pygame.image.load('gameasset/White/white_pawn.png').convert_alpha()
@@ -33,6 +36,8 @@ class Pieces(pygame.sprite.Sprite):
                 self.image = pygame.image.load('gameasset/Black/black_king.png').convert_alpha()
         
         self.rect = self.image.get_rect(topleft = pos)
+        
+    
         
 
 def draw_chess_board():
@@ -70,10 +75,37 @@ def draw_pieces():
                 if x == 2 or x == 5: all_pieces.add(Pieces('bishop', 'white', (x * 80, y * 80))) # white bishop
                 if x == 3: all_pieces.add(Pieces('queen', 'white', (x * 80, y * 80))) # white queen
                 if x == 4: all_pieces.add(Pieces('king', 'white', (x * 80, y * 80))) # white king
-                
+           
+def valid_move(type, color, pos):
+    pre_x, pre_y = 0, 0
+    cur_x, cur_y = pos
+    print(pos)
+    pre_x = (prev_pos[0] // 80) * 80
+    pre_y = (prev_pos[1] // 80) * 80
+    print(pre_y)
+    if type == 'pawn':
+        
+        if color == 'black': 
+            if pre_y == 80 and cur_y == 240:  # en passant (pawn special move)
+                print("ENPASSFUCKER")
+                return True
+            elif cur_y - pre_y == 80:
+                print("Normie move")
+                return True
+            else: return False 
             
-                
-
+        elif color == 'white':
+            if pre_y == 480 and cur_y == 320:  # en passant (pawn special move)
+                print("ENPASSFUCKER")
+                return True
+            elif pre_y - cur_y == 80:
+                print("Normie move")
+                return True
+            else: return False
+        
+        return True
+    return True
+                                
 # Init Pieces
 all_pieces = pygame.sprite.Group()
 selected_piece = pygame.sprite.GroupSingle()
@@ -92,6 +124,9 @@ draw_pieces()
 # all_pieces.add(Pieces("knight", "black", (0 * 80, 6 * 80)))
 
 dragging = False
+prev_pos = (0,0)
+turn = 0 # 0 White / 1 BLACK
+
 
 while True:
     # poll for events
@@ -107,23 +142,47 @@ while True:
                 if piece.rect.collidepoint(event.pos):
                     selected_piece.add(piece)
                     dragging = True
+                    prev_pos = event.pos
             
                 
         if event.type == pygame.MOUSEBUTTONUP and dragging: # Drop
-            if selected_piece.sprite:
-                x, y = event.pos
+            x, y = event.pos
+            valid = False
+            if selected_piece.sprite and (x >= 0 and x <= 640) and (y >= 0 and y <= 640):
                 col, row = x // 80, y // 80 # Double // for division + floor
-                selected_piece.sprite.rect.topleft = (col * 80, row * 80)
-            selected_piece.empty()
-            dragging = False
+                selected_piece.sprite.pos = (col * 80, row * 80)
+                valid = valid_move(selected_piece.sprite.type, selected_piece.sprite.color, selected_piece.sprite.pos)
+                # I know i can just put it in like another thing like pp = selected but ehhhhhhhhhhhhhh
+            else:
+                col, row = prev_pos[0] // 80, prev_pos[1] // 80 # returns to prev pos
             
-        if event.type == pygame.KEYDOWN:
+            if valid:
+                selected_piece.sprite.rect.topleft = (col * 80, row * 80)
+                selected_piece.empty()
+                dragging = False 
+            else:
+                col, row = prev_pos[0] // 80, prev_pos[1] // 80 # returns to prev pos
+                selected_piece.sprite.rect.topleft = (col * 80, row * 80)
+                selected_piece.empty()
+                
+                # im pretty sure i can just put all of this in valid_move
+            
+            
+            
+            
+            
+            
+        if event.type == pygame.KEYDOWN: # RESET PIECES POS
             if event.key == pygame.K_SPACE:
                 all_pieces.empty()
                 draw_pieces()
             
-    if dragging and selected_piece.sprite:
+    if dragging and selected_piece.sprite: # Drags the selected piece
         selected_piece.sprite.rect.center = pygame.mouse.get_pos()
+    
+    
+            
+        
             
     draw_chess_board()
     all_pieces.draw(screen)
@@ -134,3 +193,13 @@ while True:
     # limits FPS to 60
     clock.tick(60)
 
+"""
+TODOLIST LOL
+Figure out how to update all_pieces position hard :<
+this is so i can use it to check if there will be collisions
+for example a queen with a pawn in the way
+IDEA (use selected_piece instead? but i doubt it'll work since it gets deleted)
+
+Castling when a rook and king kiss
+Conditions: King not checked, Rook/King didn't move once!, nothing in the way of king and rook
+"""
