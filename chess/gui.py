@@ -89,7 +89,7 @@ def valid_move(sel_sprite, all_sprites):
     # black = blue
     # white = red
     
-    if sel_sprite.color == 'white':
+    if sel_sprite.color == 'white' and turn == 0:
         if sel_sprite.type == 'pawn':
             if cur_x == pre_x: # FORWARD ONLY
                 if pre_y == 480 and cur_y == 320:  # en passant (pawn special move)
@@ -151,7 +151,7 @@ def occupied(prev_pos, cur_pos, all_sprites, type, color):
                 print("check w")
                 for sprite in all_sprites:
                     if sprite.rect.topleft == prev_pos:
-                        return False
+                        return False, False
                 prev_pos = (prev_x, prev_y - 80)
                 prev_y -= 80
         elif type == 'rook':
@@ -161,8 +161,8 @@ def occupied(prev_pos, cur_pos, all_sprites, type, color):
                         if sprite.rect.topleft == prev_pos:
                             if sprite.color == 'black':
                                 print(sprite.pos)
-                                return False
-                            return False
+                                return False, False
+                            return False, False
                     prev_pos = (prev_x, prev_y - 80)
                     prev_y -= 80
             elif prev_y < cur_y: # top to bottom
@@ -172,7 +172,7 @@ def occupied(prev_pos, cur_pos, all_sprites, type, color):
                             # if sprite.color == 'black': # call eat here
                             #     print(f'eaten:{sprite.rect.topleft} and previous{prev_pos}')
                             #     return False
-                            return False
+                            return False, False
                     prev_pos = (prev_x, prev_y + 80)
                     prev_y += 80
             elif prev_x > cur_x: # right to left
@@ -182,7 +182,7 @@ def occupied(prev_pos, cur_pos, all_sprites, type, color):
                             # if sprite.color == 'black': # call eat here
                             #     print(f'eaten:{sprite.rect.topleft} and previous{prev_pos}')
                             #     return False
-                            return False
+                            return False, False
                     prev_pos = (prev_x - 80, prev_y)
                     prev_x -= 80
             elif prev_x < cur_x: # left to right
@@ -192,12 +192,12 @@ def occupied(prev_pos, cur_pos, all_sprites, type, color):
                             # if sprite.color == 'black': # call eat here
                             #     print(f'eaten:{sprite.rect.topleft} and previous{prev_pos}')
                             #     return False
-                            return False
+                            return False, False
                     prev_pos = (prev_x + 80, prev_y)
                     prev_x += 80
         elif type == 'knight':
             
-            return True    
+            return True, False   
             
     elif color == 'black':
         if type == 'pawn':
@@ -205,7 +205,7 @@ def occupied(prev_pos, cur_pos, all_sprites, type, color):
                 print("check b")
                 for sprite in all_sprites:
                     if sprite.rect.topleft == prev_pos:
-                        return False
+                        return False, False
                 prev_pos = (prev_x, prev_y + 80)
                 prev_y += 80
         elif type == 'rook':
@@ -216,7 +216,7 @@ def occupied(prev_pos, cur_pos, all_sprites, type, color):
                             # if sprite.color == 'black': # call eat here
                             #     print(f'eaten:{sprite.rect.topleft} and previous{prev_pos}')
                             #     return False
-                            return False
+                            return False, False
                     prev_pos = (prev_x, prev_y - 80)
                     prev_y -= 80
             elif prev_y < cur_y: # top to bottom
@@ -226,7 +226,7 @@ def occupied(prev_pos, cur_pos, all_sprites, type, color):
                             # if sprite.color == 'black': # call eat here
                             #     print(f'eaten:{sprite.rect.topleft} and previous{prev_pos}')
                             #     return False
-                            return False
+                            return False, False
                     prev_pos = (prev_x, prev_y + 80)
                     prev_y += 80
             elif prev_x > cur_x: # right to left
@@ -236,7 +236,7 @@ def occupied(prev_pos, cur_pos, all_sprites, type, color):
                             # if sprite.color == 'black': # call eat here
                             #     print(f'eaten:{sprite.rect.topleft} and previous{prev_pos}')
                             #     return False
-                            return False
+                            return False, False
                     prev_pos = (prev_x - 80, prev_y)
                     prev_x -= 80
             elif prev_x < cur_x: # left to right
@@ -246,21 +246,10 @@ def occupied(prev_pos, cur_pos, all_sprites, type, color):
                             # if sprite.color == 'black': # call eat here
                             #     print(f'eaten:{sprite.rect.topleft} and previous{prev_pos}')
                             #     return False
-                            return False
+                            return False, False
                     prev_pos = (prev_x + 80, prev_y)
                     prev_x += 80
-            
-            
-
-    # for sprite in all_sprites:
-    #     if type == 'pawn':
-    #         while prev_y != cur_y:
-    #             print("Check")
-    #             if sprite.rect.topleft == cur_pos:
-    #                 print("Not supposed to print")
-    #                 return sprite
-    #             prev_y -= 80
-    return True  
+    return True, False  
 # Init Pieces
 all_pieces = pygame.sprite.Group()
 selected_piece = pygame.sprite.GroupSingle()
@@ -274,9 +263,6 @@ dt = 0
 
 # Add Pieces (Add Function or For Loop w/Logic)
 draw_pieces()
-# all_pieces.add(Pieces("pawn", "white", (0 * 80, 6 * 80)))
-# all_pieces.add(Pieces("pawn", "white", (1 * 80, 6 * 80)))
-# all_pieces.add(Pieces("knight", "black", (0 * 80, 6 * 80)))
 
 dragging = False
 prev_pos = (0,0)
@@ -301,12 +287,13 @@ while True:
                 
         if event.type == pygame.MOUSEBUTTONUP and dragging: # Drop
             x, y = event.pos
-            valid = False           
+            valid = False
+            consume = False           
             
             if selected_piece.sprite and (x >= 0 and x <= 640) and (y >= 0 and y <= 640):
                 col, row = x // 80, y // 80 # Double // for division + floor
                 selected_piece.sprite.pos = (col * 80, row * 80)
-                valid = valid_move(selected_piece.sprite, all_pieces)
+                valid, consume = valid_move(selected_piece.sprite, all_pieces)
                 # I know i can just put it in like another thing like pp = selected but ehhhhhhhhhhhhhh
             else:
                 col, row = prev_pos[0] // 80, prev_pos[1] // 80 # returns to prev pos
