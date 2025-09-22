@@ -82,14 +82,14 @@ def valid_move(sel_sprite, all_sprites):
     cur_x, cur_y = sel_sprite.pos # Target Pos
     pre_x = (prev_pos[0] // 80) * 80
     pre_y = (prev_pos[1] // 80) * 80
-    # print(f'current x:{cur_x}')
+    print(f'current x:{cur_x}')
     print(f'current y:{cur_y}')
-    # print(f'previous x:{pre_x}')
-    print(f'previous y:{pre_y}')
+    print(f'previous x:{pre_x}')
+    print(f'previous y:{pre_y} \n')
     # black = blue
     # white = red
     
-    if sel_sprite.color == 'white' and turn == 0:
+    if sel_sprite.color == 'white':
         if sel_sprite.type == 'pawn':
             if cur_x == pre_x: # FORWARD ONLY
                 if pre_y == 480 and cur_y == 320:  # en passant (pawn special move)
@@ -105,6 +105,13 @@ def valid_move(sel_sprite, all_sprites):
                 else: return False
             elif cur_x == pre_x + 80: # EAT, check for collison
                 print("PUT HERE EAT") 
+                
+        elif sel_sprite.type == 'rook':
+            if cur_x == pre_x or cur_y == pre_y: # UP DOWN or LEFT RIGHT
+                return occupied((pre_x,pre_y), (cur_x,cur_y), all_sprites, sel_sprite.type, sel_sprite.color)
+        
+        elif sel_sprite.type == 'knight':
+            return occupied((pre_x,pre_y), (cur_x,cur_y), all_sprites, sel_sprite.type, sel_sprite.color)
     elif sel_sprite.color == 'black' and turn == 1:
         if sel_sprite.type == 'pawn':
             if cur_x == pre_x: # FORWARD ONLY
@@ -115,12 +122,16 @@ def valid_move(sel_sprite, all_sprites):
                     print("Normie move")
                     return occupied((pre_x,pre_y), (cur_x,cur_y), all_sprites, sel_sprite.type, sel_sprite.color)
                 else: return False
-                
-                
             elif cur_x == pre_x + 80: 
                 print("PUT HERE EAT") # EAT, check for collison
-        
-    
+                
+        elif sel_sprite.type == 'rook': # UP DOWN or LEFT RIGHT
+            if cur_x == pre_x or cur_y == pre_y:        
+                return occupied((pre_x,pre_y), (cur_x,cur_y), all_sprites, sel_sprite.type, sel_sprite.color)
+            
+        elif sel_sprite.type == 'knight':
+            return occupied((pre_x,pre_y), (cur_x,cur_y), all_sprites, sel_sprite.type, sel_sprite.color)
+
     return False
 
 def eat(type):
@@ -132,7 +143,8 @@ def eat(type):
 def occupied(prev_pos, cur_pos, all_sprites, type, color):
     prev_x, prev_y = prev_pos
     cur_x, cur_y = cur_pos
-    # print(type)
+    print(type)
+    print('\n')
     if color == 'white':
         if type == 'pawn':
             while prev_y != cur_y - 80:
@@ -142,7 +154,52 @@ def occupied(prev_pos, cur_pos, all_sprites, type, color):
                         return False
                 prev_pos = (prev_x, prev_y - 80)
                 prev_y -= 80
-    else:
+        elif type == 'rook':
+            if prev_y > cur_y: # bottom to top
+                while prev_y != cur_y - 80:
+                    for sprite in all_sprites:
+                        if sprite.rect.topleft == prev_pos:
+                            if sprite.color == 'black':
+                                print(sprite.pos)
+                                return False
+                            return False
+                    prev_pos = (prev_x, prev_y - 80)
+                    prev_y -= 80
+            elif prev_y < cur_y: # top to bottom
+                while prev_y != cur_y + 80:
+                    for sprite in all_sprites:
+                        if sprite.rect.topleft == prev_pos:
+                            # if sprite.color == 'black': # call eat here
+                            #     print(f'eaten:{sprite.rect.topleft} and previous{prev_pos}')
+                            #     return False
+                            return False
+                    prev_pos = (prev_x, prev_y + 80)
+                    prev_y += 80
+            elif prev_x > cur_x: # right to left
+                while prev_x != cur_x - 80:
+                    for sprite in all_sprites:
+                        if sprite.rect.topleft == prev_pos:
+                            # if sprite.color == 'black': # call eat here
+                            #     print(f'eaten:{sprite.rect.topleft} and previous{prev_pos}')
+                            #     return False
+                            return False
+                    prev_pos = (prev_x - 80, prev_y)
+                    prev_x -= 80
+            elif prev_x < cur_x: # left to right
+                while prev_x != cur_x + 80:
+                    for sprite in all_sprites:
+                        if sprite.rect.topleft == prev_pos:
+                            # if sprite.color == 'black': # call eat here
+                            #     print(f'eaten:{sprite.rect.topleft} and previous{prev_pos}')
+                            #     return False
+                            return False
+                    prev_pos = (prev_x + 80, prev_y)
+                    prev_x += 80
+        elif type == 'knight':
+            
+            return True    
+            
+    elif color == 'black':
         if type == 'pawn':
             while prev_y != cur_y + 80:
                 print("check b")
@@ -151,7 +208,49 @@ def occupied(prev_pos, cur_pos, all_sprites, type, color):
                         return False
                 prev_pos = (prev_x, prev_y + 80)
                 prev_y += 80
-                    
+        elif type == 'rook':
+            if prev_y > cur_y: # bottom to top
+                while prev_y != cur_y - 80:
+                    for sprite in all_sprites:
+                        if sprite.rect.topleft == prev_pos:
+                            # if sprite.color == 'black': # call eat here
+                            #     print(f'eaten:{sprite.rect.topleft} and previous{prev_pos}')
+                            #     return False
+                            return False
+                    prev_pos = (prev_x, prev_y - 80)
+                    prev_y -= 80
+            elif prev_y < cur_y: # top to bottom
+                while prev_y != cur_y + 80:
+                    for sprite in all_sprites:
+                        if sprite.rect.topleft == prev_pos:
+                            # if sprite.color == 'black': # call eat here
+                            #     print(f'eaten:{sprite.rect.topleft} and previous{prev_pos}')
+                            #     return False
+                            return False
+                    prev_pos = (prev_x, prev_y + 80)
+                    prev_y += 80
+            elif prev_x > cur_x: # right to left
+                while prev_x != cur_x - 80:
+                    for sprite in all_sprites:
+                        if sprite.rect.topleft == prev_pos:
+                            # if sprite.color == 'black': # call eat here
+                            #     print(f'eaten:{sprite.rect.topleft} and previous{prev_pos}')
+                            #     return False
+                            return False
+                    prev_pos = (prev_x - 80, prev_y)
+                    prev_x -= 80
+            elif prev_x < cur_x: # left to right
+                while prev_x != cur_x + 80:
+                    for sprite in all_sprites:
+                        if sprite.rect.topleft == prev_pos:
+                            # if sprite.color == 'black': # call eat here
+                            #     print(f'eaten:{sprite.rect.topleft} and previous{prev_pos}')
+                            #     return False
+                            return False
+                    prev_pos = (prev_x + 80, prev_y)
+                    prev_x += 80
+            
+            
 
     # for sprite in all_sprites:
     #     if type == 'pawn':
@@ -207,7 +306,6 @@ while True:
             if selected_piece.sprite and (x >= 0 and x <= 640) and (y >= 0 and y <= 640):
                 col, row = x // 80, y // 80 # Double // for division + floor
                 selected_piece.sprite.pos = (col * 80, row * 80)
-                # valid = valid_move(selected_piece.sprite.type, selected_piece.sprite.color, selected_piece.sprite.pos, all_pieces)
                 valid = valid_move(selected_piece.sprite, all_pieces)
                 # I know i can just put it in like another thing like pp = selected but ehhhhhhhhhhhhhh
             else:
@@ -220,6 +318,7 @@ while True:
                         turn = 0
                     else:
                         turn += 1
+                    # selected_piece.sprite.rect.topleft = (0, 0) # Test
                     selected_piece.sprite.rect.topleft = (col * 80, row * 80)
                     selected_piece.empty()
                     dragging = False 
@@ -257,11 +356,8 @@ while True:
 
 """
 TODOLIST LOL
-Figure out how to update all_pieces position hard :<
-this is so i can use it to check if there will be collisions
-for example a queen with a pawn in the way
-IDEA (use selected_piece instead? but i doubt it'll work since it gets deleted)
-col rect for loop check next next next before final move ???
+Rook Eat, remove -+ 80 and implement an if statement with a -+ 80 to check the final piece position if black/white
+then eat
 
 Castling when a rook and king kiss
 Conditions: King not checked, Rook/King didn't move once!, nothing in the way of king and rook
