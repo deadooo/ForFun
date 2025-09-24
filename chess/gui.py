@@ -55,10 +55,10 @@ def draw_pieces():
     for y in range(8): # col
         for x in range(8): # row
             if y == 1: # black pawns
-                # all_pieces.add(Pieces('pawn', 'black', (x * 80, 80)))
+                all_pieces.add(Pieces('pawn', 'black', (x * 80, 80)))
                 print()
             elif y == 6: # white pawns
-                # all_pieces.add(Pieces('pawn', 'white', (x * 80, 480)))
+                all_pieces.add(Pieces('pawn', 'white', (x * 80, 480)))
                 print()
                 
             if y == 0:
@@ -88,7 +88,7 @@ def valid_move(sel_sprite, all_sprites):
     # black = blue
     # white = red
     print(f'this is pre_y in valid_move:{pre_y}')
-    if sel_sprite.color == 'white': # and turn == 0:
+    if sel_sprite.color == 'white' and turn == 0:
         if sel_sprite.type == 'pawn':
             if cur_x == pre_x: # FORWARD ONLY
                 if pre_y == 480 and cur_y == 320:  # en passant (pawn special move)
@@ -118,6 +118,12 @@ def valid_move(sel_sprite, all_sprites):
                 return occupied((pre_x,pre_y), sel_sprite, all_sprites)
             elif abs(pre_x - cur_x) == 80 and abs(pre_y - cur_y) == 160:
                 return occupied((pre_x,pre_y), sel_sprite, all_sprites)
+    
+        elif sel_sprite.type == 'bishop':
+            print(abs(pre_x - cur_x) == abs(pre_y - cur_y))
+            if abs(pre_x - cur_x) == abs(pre_y - cur_y):
+                return occupied((pre_x,pre_y), sel_sprite, all_sprites)
+        
     elif sel_sprite.color == 'black' and turn == 1:
         if sel_sprite.type == 'pawn':
             if cur_x == pre_x: # FORWARD ONLY
@@ -145,13 +151,12 @@ def valid_move(sel_sprite, all_sprites):
             elif abs(pre_x - cur_x) == 80 and abs(pre_y - cur_y) == 160:
                 return occupied((pre_x,pre_y), sel_sprite, all_sprites)
 
-    return False, False
-
-def eat(type):
-    if(type == 'pawn'):
-        print("IM A PAWN")
+        elif sel_sprite.type == 'bishop':
+            if abs(pre_x - cur_x) == abs(pre_y - cur_y):
+                return occupied((pre_x,pre_y), sel_sprite, all_sprites)
+            
         
-    return False   
+    return False, False
 
 def occupied(prev_pos, sel_sprites, all_sprites):
     prev_x, prev_y = prev_pos
@@ -159,7 +164,7 @@ def occupied(prev_pos, sel_sprites, all_sprites):
     print(sel_sprites.type)
     print('\n\n\n')
     print(f'this is prev_pos:{prev_pos} \nthis is cur_pos:{sel_sprites.pos}')
-    print(f'this is the minus: {abs(prev_x - cur_y)}, {abs(prev_y - cur_x)}')
+    print(f'this is the minus: {abs(prev_x - cur_x)}, {abs(prev_y - cur_y)}')
     if sel_sprites.color == 'white':
         if sel_sprites.type == 'pawn':
             print(prev_y)
@@ -232,7 +237,60 @@ def occupied(prev_pos, sel_sprites, all_sprites):
                         return True, False
             return True, False   
         elif sel_sprites.type == 'bishop':
-            return True, False
+            if prev_y > cur_y and prev_x < cur_x: # up right
+                while prev_y != cur_y - 80:
+                    for sprite in all_sprites:
+                        if sprite.rect.topleft == prev_pos:
+                            if sprite.color == 'black':
+                                sprite.kill()
+                                selected_piece.sprite.rect.topleft = (sprite.pos)
+                                selected_piece.empty()
+                                return True, True
+                            return False, False
+                    prev_pos = (prev_x + 80, prev_y - 80)
+                    prev_x += 80
+                    prev_y -= 80
+            elif prev_y > cur_y and prev_x > cur_x: # up left
+                while prev_y != cur_y - 80:
+                    for sprite in all_sprites:
+                        if sprite.rect.topleft == prev_pos:
+                            if sprite.color == 'black':
+                                sprite.kill()
+                                selected_piece.sprite.rect.topleft = (sprite.pos)
+                                selected_piece.empty()
+                                return True, True
+                            return False, False
+                    prev_pos = (prev_x - 80, prev_y - 80)
+                    prev_x -= 80
+                    prev_y -= 80
+            
+            elif prev_y < cur_y and prev_x < cur_x: # down right
+                while prev_y != cur_y + 80:
+                    for sprite in all_sprites:
+                        if sprite.rect.topleft == prev_pos:
+                            if sprite.color == 'black':
+                                sprite.kill()
+                                selected_piece.sprite.rect.topleft = (sprite.pos)
+                                selected_piece.empty()
+                                return True, True
+                            return False, False
+                    prev_pos = (prev_x + 80, prev_y + 80)
+                    prev_x += 80
+                    prev_y += 80
+            
+            elif prev_y < cur_y and prev_x > cur_x: # down left
+                while prev_y != cur_y + 80:
+                    for sprite in all_sprites:
+                        if sprite.rect.topleft == prev_pos:
+                            if sprite.color == 'black':
+                                sprite.kill()
+                                selected_piece.sprite.rect.topleft = (sprite.pos)
+                                selected_piece.empty()
+                                return True, True
+                            return False, False
+                    prev_pos = (prev_x - 80, prev_y + 80)
+                    prev_x -= 80
+                    prev_y += 80        
         
     elif sel_sprites.color == 'black':
         if sel_sprites.type == 'pawn':
@@ -302,7 +360,60 @@ def occupied(prev_pos, sel_sprites, all_sprites):
                         return True, False
             return True, False
         elif sel_sprites.type == 'bishop':
-            return True, False
+            if prev_y > cur_y and prev_x < cur_x: # up right
+                while prev_y != cur_y - 80:
+                    for sprite in all_sprites:
+                        if sprite.rect.topleft == prev_pos:
+                            if sprite.color == 'white':
+                                sprite.kill()
+                                selected_piece.sprite.rect.topleft = (sprite.pos)
+                                selected_piece.empty()
+                                return True, True
+                            return False, False
+                    prev_pos = (prev_x + 80, prev_y - 80)
+                    prev_x += 80
+                    prev_y -= 80
+            elif prev_y > cur_y and prev_x > cur_x: # up left
+                while prev_y != cur_y - 80:
+                    for sprite in all_sprites:
+                        if sprite.rect.topleft == prev_pos:
+                            if sprite.color == 'white':
+                                sprite.kill()
+                                selected_piece.sprite.rect.topleft = (sprite.pos)
+                                selected_piece.empty()
+                                return True, True
+                            return False, False
+                    prev_pos = (prev_x - 80, prev_y - 80)
+                    prev_x -= 80
+                    prev_y -= 80
+            
+            elif prev_y < cur_y and prev_x < cur_x: # down right
+                while prev_y != cur_y + 80:
+                    for sprite in all_sprites:
+                        if sprite.rect.topleft == prev_pos:
+                            if sprite.color == 'white':
+                                sprite.kill()
+                                selected_piece.sprite.rect.topleft = (sprite.pos)
+                                selected_piece.empty()
+                                return True, True
+                            return False, False
+                    prev_pos = (prev_x + 80, prev_y + 80)
+                    prev_x += 80
+                    prev_y += 80
+            
+            elif prev_y < cur_y and prev_x > cur_x: # down left
+                while prev_y != cur_y + 80:
+                    for sprite in all_sprites:
+                        if sprite.rect.topleft == prev_pos:
+                            if sprite.color == 'white':
+                                sprite.kill()
+                                selected_piece.sprite.rect.topleft = (sprite.pos)
+                                selected_piece.empty()
+                                return True, True
+                            return False, False
+                    prev_pos = (prev_x - 80, prev_y + 80)
+                    prev_x -= 80
+                    prev_y += 80
     return True, False  
 # Init Pieces
 all_pieces = pygame.sprite.Group()
