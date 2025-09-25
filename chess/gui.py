@@ -100,13 +100,19 @@ def valid_move(sel_sprite, all_sprites):
                     print("Normie move\n")
                     return occupied((pre_x,pre_y), sel_sprite, all_sprites)
                     
-                else: return False, False
-            elif cur_x == pre_x + 80 or cur_x == pre_x - 80: # EAT, check for collison
-                if abs(pre_y - cur_y) == 80:
-                    print(sel_sprite.pos)
-                    
-                    print("PUT HERE EAT") 
-                    return occupied((pre_x,pre_y), sel_sprite, all_sprites)
+            elif cur_x == pre_x + 80 or cur_x == pre_x - 80 and abs(pre_y - cur_y) == 80: # EAT, check for collison
+                print(sel_sprite.pos) 
+                print("PUT HERE EAT")
+                for sprite in all_sprites:
+                    print("Test")
+                    if sprite.rect.topleft == sel_sprite.pos:
+                        if sprite.color == 'black':
+                            sprite.kill()
+                            selected_piece.sprite.rect.topleft = (sprite.pos)
+                            selected_piece.empty()
+                            return True, True
+                print(turn)
+                return False, False
                 
         elif sel_sprite.type == 'rook':
             if cur_x == pre_x or cur_y == pre_y: # UP DOWN or LEFT RIGHT
@@ -134,11 +140,16 @@ def valid_move(sel_sprite, all_sprites):
                     print("Normie move")
                     return occupied((pre_x,pre_y), sel_sprite, all_sprites)
                 else: return False, False
-            elif cur_x == pre_x - 80 or cur_x == pre_x + 80:
-                if abs(pre_y - cur_y) == 80: 
-                    print(sel_sprite.pos)
-                    print("PUT HERE EAT") # EAT, check for collison
-                    return occupied((pre_x,pre_y), sel_sprite, all_sprites)
+            elif cur_x == pre_x - 80 or cur_x == pre_x + 80 and abs(pre_y - cur_y):
+                for sprite in all_sprites:
+                    if sprite.rect.topleft == sel_sprite.pos:
+                        if sprite.color == 'white':
+                            sprite.kill()
+                            selected_piece.sprite.rect.topleft = (sprite.pos)
+                            selected_piece.empty()
+                            return True, True
+                print(turn)
+                return False, False
                 
         elif sel_sprite.type == 'rook': # UP DOWN or LEFT RIGHT
             if cur_x == pre_x or cur_y == pre_y:   
@@ -165,21 +176,16 @@ def occupied(prev_pos, sel_sprites, all_sprites):
     print('\n\n\n')
     print(f'this is prev_pos:{prev_pos} \nthis is cur_pos:{sel_sprites.pos}')
     print(f'this is the minus: {abs(prev_x - cur_x)}, {abs(prev_y - cur_y)}')
+    print(turn)
     if sel_sprites.color == 'white':
         if sel_sprites.type == 'pawn':
-            print(prev_y)
-            print(cur_y)
             while prev_y != cur_y - 80: # 480:320, 400:320, 320:320
                 for sprite in all_sprites:
                     if sprite.rect.topleft == prev_pos:
-                        if cur_x == prev_x + 80 or cur_x == prev_x - 80: # EAT, check for collison
-                            if abs(prev_y - cur_y) == 80:
-                                if sprite.color == 'black':
-                                    sprite.kill()
-                                    return True, False
                         return False, False
                 prev_pos = (prev_x, prev_y - 80)
                 prev_y -= 80
+            return True, False
         elif sel_sprites.type == 'rook':
             if prev_y > cur_y: # bottom to top
                 while prev_y != cur_y - 80:
